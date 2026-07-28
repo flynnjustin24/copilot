@@ -1,0 +1,41 @@
+name: Copilot CLI Run
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+jobs:
+  run-copilot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install prerequisites
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y curl tar gzip
+
+      - name: Install Copilot CLI
+        run: |
+          # TODO: replace the following with the official installer command from Copilot CLI docs if it differs
+          curl -fsSL "https://github.com/github/copilot-cli/releases/latest/download/copilot-cli-linux-amd64.tar.gz" -o copilot.tar.gz
+          tar -xzf copilot.tar.gz
+          sudo mv copilot /usr/local/bin/copilot
+          copilot --version
+
+      - name: Authenticate Copilot CLI
+        env:
+          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+        run: |
+          # Authenticate using the PAT stored in the COPILOT_GITHUB_TOKEN secret.
+          # Replace this with the official authentication command if different.
+          copilot auth login --token "$COPILOT_GITHUB_TOKEN"
+
+      - name: Run Copilot CLI task (example)
+        run: |
+          # Replace with the Copilot CLI command(s) you want to run in CI.
+          # This example asks Copilot to analyze a file and write suggestions to a text file.
+          copilot code --file src/App.jsx --prompt "Suggest a small refactor to improve readability" --output suggestions.txt
+          echo "Suggestions saved to suggestions.txt"
