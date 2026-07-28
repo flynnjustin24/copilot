@@ -1,0 +1,11 @@
+# Plans for Copilot feature
+
+This file documents planned CI steps and feature rollout for the Copilot feature.
+
+## CI
+- Run ESLint
+- Run unit tests
+- Run build
+
+## Deployment
+- Publish to npm (on release tag)
