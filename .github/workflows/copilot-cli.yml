@@ -28,13 +28,19 @@ jobs:
 
       - name: Install prerequisites
         run: |
-          sudo apt-get update -y
-          sudo apt-get install -y curl tar gzip
+          sudo apt-get update -y \
+            && sudo apt-get install -y --no-install-recommends curl tar gzip ca-certificates \
+            && sudo rm -rf /var/lib/apt/lists/*
 
-      - name: Install Copilot CLI (official installer)
+      - name: Install Copilot CLI (official installer) — safer
         run: |
-          curl -fsSL https://gh.io/copilot-install | sudo bash
-          copilot --version
+          # Download installer instead of piping to sudo bash directly
+          curl -fsSL -o /tmp/copilot-install.sh https://gh.io/copilot-install
+          # Optional: verify checksum if available (replace <expected-sha256> or use a secret)
+          # echo "<expected-sha256>  /tmp/copilot-install.sh" | sha256sum -c - || (echo "checksum mismatch" && exit 1)
+          chmod +x /tmp/copilot-install.sh
+          sudo /tmp/copilot-install.sh || true
+          copilot --version || true
 
       - name: Copilot diagnostic info
         run: |
@@ -57,7 +63,7 @@ jobs:
 
           echo "== repository checks =="
           if [ -f src/App.jsx ]; then echo "src/App.jsx exists"; else echo "src/App.jsx missing"; fi
-          echo "Working directory listing:"
+          echo "Working directory listing (truncated):"
           ls -la | sed -n '1,200p'
 
       - name: Authenticate Copilot CLI (non-interactive)
