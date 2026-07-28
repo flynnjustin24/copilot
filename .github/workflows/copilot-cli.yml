@@ -16,11 +16,9 @@ concurrency:
   group: copilot-cli-run-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
-
 jobs:
   run-copilot:
+    environment: copilot
     runs-on: ubuntu-latest
     timeout-minutes: 15
     if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.base_ref == 'main')
@@ -39,8 +37,6 @@ jobs:
           copilot --version
 
       - name: Copilot diagnostic info
-        env:
-          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
         run: |
           echo "== copilot binary =="
           if command -v copilot >/dev/null 2>&1; then
