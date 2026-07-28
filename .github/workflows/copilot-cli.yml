@@ -38,6 +38,32 @@ jobs:
           curl -fsSL https://gh.io/copilot-install | sudo bash
           copilot --version
 
+      - name: Copilot diagnostic info
+        env:
+          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+        run: |
+          echo "== copilot binary =="
+          if command -v copilot >/dev/null 2>&1; then
+            echo "copilot found at: $(command -v copilot)"
+            copilot --version || echo "copilot --version failed"
+            ls -l "$(command -v copilot)" || true
+          else
+            echo "copilot binary not found"
+          fi
+
+          echo "== environment (presence only) =="
+          if [ -n "${COPILOT_GITHUB_TOKEN:-}" ]; then echo "COPILOT_GITHUB_TOKEN is set"; else echo "COPILOT_GITHUB_TOKEN is NOT set"; fi
+          if [ -n "${GH_TOKEN:-}" ]; then echo "GH_TOKEN is set"; else echo "GH_TOKEN is NOT set"; fi
+          if [ -n "${GITHUB_TOKEN:-}" ]; then echo "GITHUB_TOKEN is set"; else echo "GITHUB_TOKEN is NOT set"; fi
+
+          echo "== copilot auth check =="
+          copilot auth status 2>&1 || echo "copilot auth status not available or failed (nonfatal)"
+
+          echo "== repository checks =="
+          if [ -f src/App.jsx ]; then echo "src/App.jsx exists"; else echo "src/App.jsx missing"; fi
+          echo "Working directory listing:"
+          ls -la | sed -n '1,200p'
+
       - name: Authenticate Copilot CLI (non-interactive)
         env:
           COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
