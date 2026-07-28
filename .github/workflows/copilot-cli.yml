@@ -1,13 +1,29 @@
 name: Copilot CLI Run
 on:
   workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+
 permissions:
   contents: read
+
+concurrency:
+  group: copilot-cli-run-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+
 jobs:
   run-copilot:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.base_ref == 'main')
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -17,25 +33,23 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y curl tar gzip
 
-      - name: Install Copilot CLI
+      - name: Install Copilot CLI (official installer)
         run: |
-          # TODO: replace the following with the official installer command from Copilot CLI docs if it differs
-          curl -fsSL "https://github.com/github/copilot-cli/releases/latest/download/copilot-cli-linux-amd64.tar.gz" -o copilot.tar.gz
-          tar -xzf copilot.tar.gz
-          sudo mv copilot /usr/local/bin/copilot
+          curl -fsSL https://gh.io/copilot-install | sudo bash
           copilot --version
 
-      - name: Authenticate Copilot CLI
+      - name: Authenticate Copilot CLI (non-interactive)
         env:
           COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
         run: |
-          # Authenticate using the PAT stored in the COPILOT_GITHUB_TOKEN secret.
-          # Replace this with the official authentication command if different.
-          copilot auth login --token "$COPILOT_GITHUB_TOKEN"
+          # The CLI will use COPILOT_GITHUB_TOKEN/GH_TOKEN/GITHUB_TOKEN for non-interactive auth
+          if command -v copilot >/dev/null 2>&1; then
+            copilot auth login --token "$COPILOT_GITHUB_TOKEN" || true
+          fi
 
       - name: Run Copilot CLI task (example)
+        env:
+          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
         run: |
-          # Replace with the Copilot CLI command(s) you want to run in CI.
-          # This example asks Copilot to analyze a file and write suggestions to a text file.
           copilot code --file src/App.jsx --prompt "Suggest a small refactor to improve readability" --output suggestions.txt
           echo "Suggestions saved to suggestions.txt"
