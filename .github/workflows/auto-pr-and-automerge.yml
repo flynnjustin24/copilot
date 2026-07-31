@@ -37,6 +37,9 @@ jobs:
       pull-requests: write
       contents: read
     steps:
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
       - name: Enable auto-merge (via GraphQL)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
