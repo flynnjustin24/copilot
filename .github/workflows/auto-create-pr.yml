@@ -1,0 +1,58 @@
+name: Auto-create PR and enable auto-merge
+
+on:
+  push:
+    branches:
+      - 'feature/**'
+
+jobs:
+  create-pr-and-enable-automerge:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref_name }}
+          base: main
+          title: "Export fizzBuzz function and add CLI support"
+          body: "Converts fizz-buzz.js to export a fizzBuzz(n) function and adds Jest tests, a README, CI workflow, auto-merge workflow, CODEOWNERS, and Dependabot config."
+          commit-message: "Create PR for ${{ github.ref_name }}"
+          labels: "auto-generated"
+
+      - name: Enable auto-merge (via GraphQL)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+          PR_NUMBER: ${{ steps.cpr.outputs.pull-request-number }}
+        run: |
+          if [ -z "$PR_NUMBER" ] || [ "$PR_NUMBER" = "null" ]; then
+            echo "No pull request number available; skipping auto-merge step."
+            exit 0
+          fi
+
+          echo "Fetching PR node id for PR #$PR_NUMBER"
+          pr_node_id=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$OWNER/$REPO/pulls/$PR_NUMBER" | jq -r .node_id)
+
+          if [ -z "$pr_node_id" ] || [ "$pr_node_id" = "null" ]; then
+            echo "Failed to get PR node id."
+            exit 1
+          fi
+
+          echo "Enabling auto-merge (squash) for PR #$PR_NUMBER (node id: $pr_node_id)"
+
+          mutation="mutation { enablePullRequestAutoMerge(input:{pullRequestId:\"$pr_node_id\", mergeMethod:SQUASH}) { pullRequest { number } } }"
+
+          resp=$(curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -d "{\"query\": \"$mutation\"}" https://api.github.com/graphql)
+
+          echo "$resp"
