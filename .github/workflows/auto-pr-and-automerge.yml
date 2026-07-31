@@ -28,7 +28,7 @@ jobs:
           title: "Export fizzBuzz function and add CLI support"
           body: "Converts fizz-buzz.js to export a fizzBuzz(n) function and adds Jest tests, a README, CI workflow, auto-merge workflow, CODEOWNERS, and Dependabot config."
           commit-message: "Create PR for ${{ github.ref_name }}"
-          labels: "auto-generated"
+          labels: "auto-generated, ci"
           reviewers: "flynnjustin24"
 
   enable-automerge:
