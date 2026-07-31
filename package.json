@@ -5,6 +5,9 @@
   "scripts": {
     "test": "jest"
   },
+  "bin": {
+    "fizz-buzz": "bin/fizz-buzz"
+  },
   "devDependencies": {
     "jest": "^29.0.0"
   }
