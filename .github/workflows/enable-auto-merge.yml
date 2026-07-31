@@ -1,0 +1,21 @@
+name: Enable auto-merge for pull requests
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited]
+
+jobs:
+  enable-automerge:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+      - name: Enable auto-merge for this PR
+        uses: peter-evans/enable-pull-request-automerge@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          merge_method: squash
+          required_approving_review_count: 1
+          allow_merge_when_passing: true
