@@ -29,6 +29,7 @@ jobs:
           body: "Converts fizz-buzz.js to export a fizzBuzz(n) function and adds Jest tests, a README, CI workflow, auto-merge workflow, CODEOWNERS, and Dependabot config."
           commit-message: "Create PR for ${{ github.ref_name }}"
           labels: "auto-generated"
+          reviewers: "flynnjustin24"
 
   enable-automerge:
     if: github.event_name == 'pull_request'
