@@ -1,7 +1,8 @@
 {
   "name": "copilot-fizz-buzz",
   "version": "1.0.0",
-  "main": "fizz-buzz.js",
+  "main": "src/fizz-buzz.js",
+  "type": "module",
   "scripts": {
     "test": "jest"
   },

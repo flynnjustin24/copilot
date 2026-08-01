@@ -1,6 +1,4 @@
-// src/fizz-buzz.js
-
-function fizzBuzz(n) {
+export default function fizzBuzz(n) {
   if (typeof n !== 'number' || !Number.isInteger(n)) {
     throw new TypeError('n must be an integer');
   }
@@ -10,5 +8,3 @@ function fizzBuzz(n) {
   if (n % 5 === 0) return 'Buzz';
   return String(n);
 }
-
-module.exports = { fizzBuzz };
