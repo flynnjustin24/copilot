@@ -1,37 +1,45 @@
+# copilot-fizz-buzz
 
-## Installing Copilot CLI
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-To install and authenticate the GitHub Copilot CLI non-interactively (useful for CI), add the following steps to your environment or CI workflow.
+A small fizz-buzz utility exported as an ESM module with a tiny CLI and Jest tests.
 
-Install prerequisites (Debian/Ubuntu):
+## Installation
 
-```sh
-sudo apt-get update -y
-sudo apt-get install -y curl tar gzip
-```
+Install dependencies and link the CLI locally (developer setup):
 
-Install Copilot CLI (official installer):
+npm install
+npm link
 
-```sh
-# Installs the `copilot` binary to a standard location (e.g., /usr/local/bin)
-curl -fsSL https://gh.io/copilot-install | sudo bash
-# Verify install
-copilot --version
-```
+Alternatively, run the CLI directly from the repository:
 
-Authenticate non-interactively using a Personal Access Token (PAT):
+chmod +x bin/fizz-buzz
+./bin/fizz-buzz 15
 
-```sh
-# Create a PAT with the Copilot / Copilot Requests scope
-# Then set it in your environment (CI secrets) as COPILOT_GITHUB_TOKEN (preferred)
-export COPILOT_GITHUB_TOKEN="ghp_yourPATtoken"
-# The Copilot CLI also checks GH_TOKEN and GITHUB_TOKEN if COPILOT_GITHUB_TOKEN is not set
+## CLI
 
-# You can now run copilot commands non-interactively, for example:
-COPILOT_GITHUB_TOKEN="$COPILOT_GITHUB_TOKEN" copilot code --file src/App.jsx --prompt "Suggest a small refactor" --output suggestions.txt
-```
+Usage:
 
-Notes
-- Store the PAT as a repository secret (e.g., Actions secret COPILOT_GITHUB_TOKEN) rather than in plaintext.
-- Use the least privilege for the token and rotate periodically.
-- If you prefer interactive login, run `copilot` and follow the `/login` instructions.
+fizz-buzz <number>
+
+Example:
+
+fizz-buzz 15
+# Output: FizzBuzz
+
+## API (ESM)
+
+Import and use the function in your project:
+
+import fizzBuzz from './src/fizz-buzz.js';
+console.log(fizzBuzz(3)); // "Fizz"
+
+## Tests
+
+Run tests with:
+
+npm test
+
+## License
+
+This project is licensed under the MIT License. See the LICENSE file for details.
