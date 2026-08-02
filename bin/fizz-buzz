@@ -1,0 +1,17 @@
+#!/usr/bin/env node
+
+const { fizzBuzz } = require('../src/fizz-buzz');
+
+const input = process.argv[2];
+if (!input) {
+  console.error('Usage: fizz-buzz <number>');
+  process.exit(1);
+}
+
+const n = Number(input);
+if (!Number.isInteger(n)) {
+  console.error('Input must be an integer');
+  process.exit(1);
+}
+
+console.log(fizzBuzz(n));
